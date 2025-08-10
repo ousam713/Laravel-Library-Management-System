@@ -94,7 +94,7 @@ class UserController extends Controller
             ]);
 
             return redirect()->route('admin.users.all')
-                ->with('success', 'User created successfully');
+                ->with('success', 'Utilisateur créé avec succès');
 
         } catch (\Exception $e) {
             return redirect()->back()
@@ -169,7 +169,7 @@ class UserController extends Controller
                 $user->save();
 
                 return redirect()->route('admin.users.all')
-                    ->with('success', 'User updated successfully');
+                    ->with('success', "L'utilisateur a été mis à jour avec succès");
             }
 
             return redirect()->back()->with('info', 'No changes were made');
@@ -202,7 +202,7 @@ class UserController extends Controller
             $userToDelete->delete();
 
             return redirect()->route('admin.users.all')
-                ->with('success', "User #{$id} deleted successfully");
+                ->with('success', "L'utilisateur #{$id} a été supprimé avec succès");
 
         } catch (\Exception $e) {
             return redirect()->back()

@@ -50,9 +50,9 @@
                         <label for="role" class="form-label">Role</label>
                         <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                             <option value="">Select Role</option>
-                            <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="librarian" {{ old('role') == 'librarian' ? 'selected' : '' }}>Librarian</option>
+                            <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>étudiant</option>
+                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>admin</option>
+                            <option value="librarian" {{ old('role') == 'librarian' ? 'selected' : '' }}>bibliothécaire</option>
                         </select>
                         @error('role')
                             <div class="invalid-feedback">{{ $message }}</div>

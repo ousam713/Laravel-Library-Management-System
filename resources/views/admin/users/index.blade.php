@@ -51,7 +51,7 @@
                     <div class="col-md-4">
                         <label for="status" class="form-label">Statut</label>
                         <select class="form-select" id="status" name="status" style="cursor: pointer;">
-                            <option value="">All Statuses</option>
+                            <option value="">Tout les statuts</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Actif</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactif</option>
                         </select>
@@ -81,11 +81,24 @@
     {{-- Search results info --}}
     @if(request()->hasAny(['search', 'role', 'status']))
         <div class="alert alert-info mb-3">
-            Showing results for:
-            @if(request('search')) <strong>Search:</strong> {{ request('search') }} @endif
-            @if(request('role')) <strong>Role:</strong> {{ ucfirst(request('role')) }} @endif
-            @if(request('status')) <strong>Status:</strong> {{ ucfirst(request('status')) }} @endif
-            <a href="{{ route('admin.users.all') }}" class="float-end">Show all</a>
+            @php
+                $search = request('search');
+                $role = request('role');
+                $status = request('status');
+            @endphp
+            Affichage des résultats pour:
+            @if(request('search')) <strong>Recherche:</strong> {{ request('search') }} @endif
+            @if(request('role')) <strong>Rôle:</strong> 
+                @if ($role === 'student')
+                    Étudiant
+                @elseif ($role === 'admin')
+                    admin
+                @elseif ($role === 'librarian')
+                    bibliothécaire
+                @endif
+            @endif
+            @if(request('status')) <strong>Statut:</strong> {{ ucfirst(request('status')) }} @endif
+            <a href="{{ route('admin.users.all') }}" class="float-end">Afficher tout</a>
         </div>
     @endif
 

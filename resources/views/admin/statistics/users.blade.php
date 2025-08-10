@@ -141,7 +141,7 @@ use App\Enums\RequestStatus;
                                         @endphp
 
                                         <span class="badge bg-{{ $bgColor }}"> {{$badgeText}} </span>
-                                        <small>({{ "il y'a " . str_replace([' hours ago', 'hour ago'], 'h', $latestInfo?->created_at->diffForHumans()) }}) </small>
+                                        <small>({{ "il y'a " . str_replace([' hours ago', 'hour ago', ' day ago','ago','week'], ['h', 'h', 'j','','semaine'], $latestInfo?->created_at->diffForHumans()) }}) </small>
                                         
                                     @else
                                         <span class="badge bg-secondary">pas d'activié</span>

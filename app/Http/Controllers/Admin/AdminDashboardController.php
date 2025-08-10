@@ -30,7 +30,7 @@ class AdminDashboardController extends Controller
             $pending_requests_data = [];
 
             foreach ($pending_requests as $request) {
-                $student = User::findOrFail(1, ['first_name', 'last_name']);
+                $student = User::findOrFail($request->user_id, ['first_name', 'last_name']);
                 $data = (object) [
                     'id' => $request->id,
                     'book_title' => Book::findOrFail($request->book_id)->title,

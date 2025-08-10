@@ -35,7 +35,8 @@ return [
         ],
     ],
     'google-book' => [
-        'url' => env('GOOGLE_BOOKS_SERVICE_URL'),
+        'url' => 'https://www.googleapis.com/books/v1/volumes?q=isbn:',
+        'api_key' => env('GOOGLE_BOOKS_API_KEY'),
     ],
 
 ];

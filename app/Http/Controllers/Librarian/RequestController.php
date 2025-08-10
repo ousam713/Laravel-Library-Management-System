@@ -130,11 +130,11 @@ class RequestController extends Controller
     {
         //
         try {
-            $requests = BookRequest::with('requestInfo', 'user', 'book')
+            $requests = BookRequest::with( 'user', 'book')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
             // Get all possible statuses for the filter dropdown
-            $statuses = collect(\App\Enums\RequestStatus::cases())->filter(fn ($status) => $status->value !== 'canceled' && $status->value !== 'pending');
+            $statuses = collect(RequestStatus::cases())->filter(fn ($status) => $status->value !== 'canceled' && $status->value !== 'pending');
 
             return view('librarian.requests.index', compact('requests', 'statuses'));
 

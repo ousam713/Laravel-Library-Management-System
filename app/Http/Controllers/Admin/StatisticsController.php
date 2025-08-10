@@ -19,35 +19,38 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class StatisticsController extends Controller
 {
+        public function dashboard(){
+        return view('admin.statistics.index');
+    }
+
+
     public function users_stat(Request $request)
     {
         try {
             // Get students with their latest book request and related info
-            $students = Student::with(['bookRequests' => function ($query) {
-                $query->with(['latestRequestInfo', 'book'])
-
-                    ->limit(1);
-            }])
+            $students = Student::with(['bookRequests' => function($query) {
+                    $query->with(['latestRequestInfo', 'book'])
+                        
+                        ->limit(1);
+                }])
                 ->latest()
-                ->paginate(20);
+                ->paginate(22);
 
             return view('admin.statistics.users', ['users' => $students]);
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Erreur lors du chargement des données des étudiants : '.$e->getMessage());
+                ->with('error', 'Erreur lors du chargement des données des étudiants : ' . $e->getMessage());
         }
-    }
+}
 
-    
-public function search(Request $request)
-{
-    try{
+    public function search(Request $request)
+    {
         $search = $request->input('search');
         $status = $request->input('status');
         $activity = $request->input('activity');
 
         $users = Student::query()
-            ->with(['bookRequests' => function ($query) {
+            ->with(['bookRequests' => function($query) {
                 $query->with(['latestRequestInfo', 'book'])
                     ->latest()
                     ->limit(1);
@@ -55,38 +58,26 @@ public function search(Request $request)
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('id', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
                 });
             })
-            ->when($activity === null, function ($query) {
-                $query->doesntHave('bookRequests');
+            ->when($status, function ($query, $status) {
+                return $query->where('is_active', $status == 'active');
             })
-            ->when($activity !== null, function ($query) use ($activity) {
-                $query->whereHas('bookRequests', function ($bookRequestQuery) use ($activity) {
-                    $bookRequestQuery->whereHas('requestInfo', function ($requestInfoQuery) use ($activity) {
-                        $requestInfoQuery->where('status', RequestStatus::from($activity))
-                            ->whereRaw('id = (
-                                SELECT MAX(ri.id) 
-                                FROM request_infos ri 
-                                WHERE ri.request_id = book_requests.id
-                            )');
-                    });
+            ->when($activity, function ($query, $activity) {
+                return $query->whereHas('bookRequests.latestRequestInfo', function($q) use ($activity) {
+                    $q->where('status', RequestStatus::from($activity));
                 });
             })
-            ->latest()
+            ->orderBy('id')
             ->paginate(20);
 
-        if (! $users->count()) {
-            return redirect()->back()->with('info', 'Aucun utilisateur trouvé correspondant à vos critères.');
-        }
-
+            if(!$users->count()) {
+                return redirect()->back()->with('info', 'Aucun utilisateur trouvé correspondant à vos critères.');
+            }
         return view('admin.statistics.users', compact('users'));
-    }catch (\Exception $e) {
-        return redirect()->back()
-            ->with('error', 'Erreur lors du chargement des données des étudiants : '.$e->getMessage());
-    }
 }
 
         public function search_librarian(Request $request)
@@ -135,6 +126,7 @@ public function search(Request $request)
             $query = $request->input('search');
 
             $books = Book::where('title', 'like', "%{$query}%")
+                ->orWhere('isbn', 'like', "%{$query}%")
                 ->paginate(20);
 
             if (! $books->count()) {
@@ -238,7 +230,7 @@ private function formatRequestInfo($requestInfo)
         'status' => $requestInfo->status,
         'processed_at' => $processed_at,
         'processed_by' => $librarian,
-        'created_diff' => "il y'a " . str_replace([' hours ago', 'hour ago'], 'h', $requestInfo->created_at->diffForHumans()),
+        'created_diff' => "il y'a " . str_replace([' hours ago', 'hour ago', 'ago','week'], ['h','h','','semaine'], $requestInfo->created_at->diffForHumans()),
         'processed_diff' => $requestInfo->created_at?->diffForHumans(),
         'action_date' => $requestInfo->created_at,
         'action_date_formatted' => $requestInfo->created_at->format('d/m/Y H:i'),
@@ -261,7 +253,7 @@ public function librarian_history(Librarian $user)
                 'id' => $request->id,
                 'request_info_id' => $requestInfo->id,
                 'created_at' => $requestInfo->created_at,
-                'created_diff' => "il y'a ".str_replace([' hours ago', 'hour ago', ' day ago'], ['h', 'h', 'j'], $requestInfo->created_at->diffForHumans()),
+                'created_diff' => "il y'a ".str_replace([' hours ago', 'hour ago', ' day ago','ago','week'], ['h', 'h', 'j','','semaine'], $requestInfo->created_at->diffForHumans()),
                 'response_date' => $requestInfo->created_at,
                 'book_title' => $request->book->title ?? 'N/A',
                 'status' => $requestInfo->status,
